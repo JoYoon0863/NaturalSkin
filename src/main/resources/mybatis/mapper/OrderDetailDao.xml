@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IOrderDetailDao"> 
+
+	<insert id="orderDetail">
+	  <selectKey keyProperty="order_detail_id" resultType="int" order="BEFORE">
+	        select order_detail_seq.nextval FROM DUAL
+	  </selectKey>
+      INSERT INTO order_detail(order_detail_id, member_order_id, member_id, product_id, order_detail_amount, order_detail_price, order_detail_review ) 
+	  VALUES (#{order_detail_id}, #{param1}, #{param2}, #{param3}, #{param4}, #{param5}, 0)
+   </insert>
+   
+   <select id="myPageOrder" resultType="com.naturalskin.dto.OrderDetailDto"> 
+		SELECT * FROM member_order a, order_detail b, product c WHERE a.member_order_id = #{param1} AND b.member_order_id = #{param1} AND b.product_id = c.product_id
+	</select>
+	
+	
+    
+</mapper>

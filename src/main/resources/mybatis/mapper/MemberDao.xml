@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IMemberDao"> 
+
+	<select id="admin_count" resultType="int">
+		SELECT COUNT(*) FROM member WHERE member_role = 1 
+	</select>
+	
+	<select id="users_count" resultType="int">
+		SELECT COUNT(*) FROM member WHERE member_role = 0 
+	</select>
+
+	<select id="member_list" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member ORDER BY member_date DESC
+	</select>
+	
+	<select id="SearchID" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member WHERE member_id LIKE '%' || #{param1} || '%' ORDER BY member_date DESC 
+	</select>
+	
+	<select id="SearchName" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member WHERE member_name LIKE '%' || #{param1} || '%' ORDER BY member_date DESC 
+	</select>
+	
+	<select id="SearchRole" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member WHERE member_role = #{param1} ORDER BY member_date DESC 
+	</select>
+	
+	<select id="memberInformation" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member WHERE member_id = #{param1}
+	</select>	
+	
+	<update id="memberInformationUpdate">
+		UPDATE member SET member_pw = #{param2}, member_name = #{param3}, member_birthday= #{param4},
+		member_gender= #{param5}, member_address= #{param6}, member_phone= #{param7}, member_email= #{param8}
+		 WHERE member_id = #{param1}
+	</update> 
+	
+	<delete id="memberDrop">
+		DELETE FROM member WHERE member_id = #{param1}
+	</delete>
+	
+	<select id="listPageDao" resultType="com.naturalskin.dto.MemberDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, member.*
+	        FROM
+	            member
+	        ORDER BY member_date desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+    
+    <select id="pageCount" resultType="int">
+		SELECT COUNT(*) FROM member
+	</select>
+	
+	<insert id="newMember">
+	  <selectKey keyProperty="member_idx" resultType="int" order="BEFORE">
+	        select member_seq.nextval FROM DUAL
+	  </selectKey>
+      INSERT INTO member(member_id, member_idx, member_pw, member_name, member_birthday, member_gender, member_address, member_phone, member_email, member_role, member_date) 
+						VALUES (#{param1}, #{member_idx}, #{param2}, #{param3}, #{param4}, #{param5}, #{param6}, #{param7}, #{param8}, 0, default)
+   </insert>
+	
+	<select id="login" resultType="int">
+		SELECT COUNT(*) FROM member WHERE member_id = #{param1} AND member_pw = #{param2}
+	</select>
+	
+	<select id="roleCheck" resultType="int">
+		SELECT COUNT(*) FROM member WHERE member_id = #{param1} AND member_role = 1 
+	</select>
+	
+	<select id="memberInfo" resultType="com.naturalskin.dto.MemberDto">
+		SELECT * FROM member WHERE member_id = #{param1}
+	</select>
+	
+	<select id="emailIdFind" resultType="com.naturalskin.dto.MemberDto">
+		SELECT * FROM member WHERE member_name = #{param1} AND member_email = #{param2}
+	</select>
+	
+	<select id="phoneIdFind" resultType="com.naturalskin.dto.MemberDto">
+		SELECT * FROM member WHERE member_name = #{param1} AND member_phone = #{param2}
+	</select>
+	
+	<select id="emailPwFind" resultType="com.naturalskin.dto.MemberDto">
+		SELECT * FROM member WHERE member_id = #{param1} AND member_name = #{param2} AND member_email = #{param3}
+	</select>
+	
+	<select id="phonePwFind" resultType="com.naturalskin.dto.MemberDto">
+		SELECT * FROM member WHERE member_id = #{param1} AND member_name = #{param2} AND member_phone = #{param3}
+	</select>
+	
+	<update id="pwUpdate">
+		UPDATE member SET member_pw = #{param4} WHERE member_id = #{param1} AND member_name = #{param2} AND member_email = #{param3}
+	</update> 
+	
+	<update id="pwUpdate2">
+		UPDATE member SET member_pw = #{param4} WHERE member_id = #{param1} AND member_name = #{param2} AND member_phone = #{param3}
+	</update> 
+	
+	<select id="idCheck" resultType="_int">
+    		SELECT COUNT(*) FROM member WHERE member_id=#{param1}
+	</select>
+	
+</mapper>

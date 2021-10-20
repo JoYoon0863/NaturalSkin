@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IReviewReplyDao"> 
+
+	<select id="list" resultType="com.naturalskin.dto.ReviewReplyDto">
+		SELECT * FROM review_reply WHERE review_board_id = #{param1}
+		START WITH review_reply_depth = 0
+		CONNECT BY PRIOR review_reply_id = review_reply_group_no
+	</select>
+	
+	<insert id="replyW">
+	  <selectKey keyProperty="review_reply_id" resultType="int" order="BEFORE">
+	        select review_reply_seq.nextval FROM DUAL
+	  </selectKey>
+      INSERT INTO review_reply(review_reply_id, review_board_id, product_id, member_id, review_reply_content, review_reply_date, 
+      							review_reply_group_no, review_reply_depth, review_reply_group_order ) 
+	  VALUES (#{review_reply_id}, #{param1}, #{param2}, #{param3}, #{param4}, sysdate, 0, 0, 1)
+   </insert>
+   
+   <insert id="rereplyW">
+	  <selectKey keyProperty="review_reply_id" resultType="int" order="BEFORE">
+	        select review_reply_seq.nextval FROM DUAL
+	  </selectKey>
+      INSERT INTO review_reply(review_reply_id, review_board_id, product_id, member_id, review_reply_content, review_reply_date, 
+      							review_reply_group_no, review_reply_depth, review_reply_group_order ) 
+	  VALUES (#{review_reply_id}, #{param1}, #{param2}, #{param3}, #{param4}, sysdate, #{param5}, 1, 2)
+   </insert>
+	
+	<delete id="replyD">
+		DELETE FROM review_reply WHERE review_reply_id = #{param1} OR review_reply_group_no = #{param1}
+	</delete>
+	
+	<update id="replyM">
+		UPDATE review_reply SET review_reply_content = #{param2} WHERE review_reply_id = #{param1}
+	</update>
+	
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IReviewBoardDao"> 
+
+	<select id="listPageDao" resultType="com.naturalskin.dto.ReviewBoardDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, review_board.*
+	        FROM
+	            review_board
+	        ORDER BY review_board_id desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+	
+    <select id="pageCount" resultType="int">
+		SELECT COUNT(*) FROM review_board
+	</select>
+	
+	<select id="myReviewList" resultType="com.naturalskin.dto.ReviewBoardDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, review_board.*
+	        FROM
+	            review_board
+	        WHERE 
+	        	member_id = #{param3}    
+	        ORDER BY review_board_id desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+	
+	<insert id="reviewWA">
+		<selectKey keyProperty="review_board_id" resultType="int" order="BEFORE">
+			select review_board_seq.nextval FROM DUAL
+		</selectKey>
+			INSERT INTO review_board(review_board_id, member_id, product_id, review_board_title, review_board_score, review_board_date, 
+									review_board_img_path, review_board_hit, review_board_content)
+			VALUES (#{review_board_id}, #{param1}, #{param2}, #{param3}, #{param4}, sysdate, #{param5}, 0, #{param6})
+	</insert>
+	
+	<select id="list" resultType="com.naturalskin.dto.ReviewBoardDto">
+		SELECT * FROM review_board WHERE review_board_id = #{param1}
+	</select>
+	
+	<update id="hit">
+		UPDATE review_board SET review_board_hit = review_board_hit + 1 WHERE review_board_id = #{param1}
+	</update> 
+	
+	<update id="reviewMA">
+		UPDATE review_board SET review_board_title = #{param2}, review_board_score = #{param3}, 
+								review_board_img_path = #{param4}, review_board_content = #{param5} 
+		WHERE review_board_id = #{param1}
+	</update> 
+	
+	<delete id="delete">
+		DELETE FROM review_board WHERE review_board_id = #{param1}
+	</delete>
+	
+	<select id="reviewList" resultType="com.naturalskin.dto.ReviewBoardDto">
+		SELECT * FROM review_board WHERE product_id = #{param1}
+	</select>
+</mapper>

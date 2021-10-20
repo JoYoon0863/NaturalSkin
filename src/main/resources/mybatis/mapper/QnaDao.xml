@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IQnaDao"> 
+
+	<select id="qna_count" resultType="int">
+		SELECT COUNT(*) FROM qna_board WHERE qna_board_reply_state = 0 
+	</select>
+
+	<select id="qna_list" resultType="com.naturalskin.dto.QnaDto">
+		SELECT  b.*
+	    FROM member a JOIN qna_board b
+	    ON a.member_id = b.member_id 
+        START WITH b.qna_board_group_no = 0
+		CONNECT BY PRIOR b.qna_board_id = b.qna_board_group_no
+	</select>
+	
+	<select id="SearchID" resultType="com.naturalskin.dto.QnaDto">
+		SELECT * FROM member a JOIN qna_board b ON a.member_id = b.member_id 
+		WHERE b.member_id LIKE '%' || #{param1} || '%' 
+		ORDER BY b.qna_board_group_no DESC, b.qna_board_date 
+	</select>
+	
+	<select id="serachType" resultType="com.naturalskin.dto.QnaDto">
+		SELECT * FROM member a JOIN qna_board b ON a.member_id = b.member_id 
+		WHERE b.qna_board_type = #{param1} 
+		ORDER BY b.qna_board_group_no DESC, b.qna_board_date
+	</select>
+	
+	<select id="searchState" resultType="com.naturalskin.dto.QnaDto">
+		SELECT * FROM member a JOIN qna_board b ON a.member_id = b.member_id 
+		WHERE b.qna_board_reply_state = #{param1} 
+		ORDER BY b.qna_board_group_no DESC, b.qna_board_date
+	</select>
+	
+	<select id="qnaContentView" resultType="com.naturalskin.dto.QnaDto">
+		SELECT * FROM qna_board WHERE qna_board_id = #{param1}
+	</select>
+	
+	<delete id="qnaDelete">
+		DELETE FROM qna_board WHERE qna_board_id = #{param1} OR qna_board_group_no = #{param1}
+	</delete>
+	
+	<delete id="qnaDelete2">
+		DELETE FROM qna_board WHERE qna_board_id = #{param1}
+	</delete>
+	
+	<update id="hit">
+		UPDATE qna_board SET qna_board_hit = qna_board_hit + 1 WHERE qna_board_id = #{param1}
+	</update>
+	
+	<insert id="qnaReplyWrite">
+		<selectKey keyProperty="qna_board_id" resultType="int" order="BEFORE">
+			select qna_board_seq.nextval FROM DUAL
+		</selectKey>
+		INSERT INTO qna_board( qna_board_id, qna_board_group_no, qna_board_type, qna_board_title, member_id, qna_board_content, qna_board_lock, qna_board_date, qna_board_reply_state, qna_board_hit, product_id )
+						VALUES (#{qna_board_id}, #{param1}, #{param2}, #{param3}, #{param4}, #{param5}, #{param6}, sysdate, 1, 0, #{param7})
+	</insert>
+	
+	<update id="contentViewUpdate">
+		UPDATE qna_board SET qna_board_reply_state = qna_board_reply_state + 1 WHERE qna_board_id = #{param1}
+	</update>
+	
+	<select id="listPageDao" resultType="com.naturalskin.dto.QnaDto">
+	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, b.*
+	        FROM
+	            member a JOIN qna_board b
+	        ON a.member_id = b.member_id 
+           	START WITH b.qna_board_group_no = 0
+			CONNECT BY PRIOR b.qna_board_id = b.qna_board_group_no
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+	
+    <select id="pageCount" resultType="int">
+		SELECT COUNT(*) FROM qna_board
+	</select>
+	
+	<select id="role" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member a JOIN qna_board b ON a.member_id = b.member_id 
+		ORDER BY b.qna_board_group_no DESC, b.qna_board_date
+	</select>
+	
+	<update id="update">
+		UPDATE qna_board SET qna_board_reply_state = 0 WHERE qna_board_id = #{param1}
+	</update>
+	
+	<update id="aQnaViewUpdate">
+		UPDATE qna_board SET qna_board_content = #{param2} WHERE qna_board_id = #{param1}
+	</update>
+	
+	<insert id="qnaWrite">
+		<selectKey keyProperty="qna_board_id" resultType="int" order="BEFORE">
+			select qna_board_seq.nextval FROM DUAL
+		</selectKey>
+		INSERT INTO qna_board(qna_board_id, member_id, qna_board_type, product_id, qna_board_lock, qna_board_title, qna_board_content, qna_board_date, qna_board_reply_state, qna_board_hit, qna_board_group_no)
+		VALUES (#{qna_board_id}, #{param1}, #{param2}, #{param3}, #{param4}, #{param5}, #{param6}, sysdate, 0, 0, 0)
+	</insert>
+
+	<update id="qnaM">
+		UPDATE qna_board 
+		SET qna_board_type = #{param2}, product_id = #{param3}, qna_board_lock = #{param4}, qna_board_title = #{param5}, qna_board_content = #{param6}
+		WHERE qna_board_id = #{param1}
+	</update>
+	
+	<select id="myQnaList" resultType="com.naturalskin.dto.QnaDto">
+	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, qna_board.*
+	        FROM
+	            qna_board
+	        WHERE
+	       		member_id = #{param3}
+	        ORDER BY qna_board_group_no DESC, qna_board_date
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+    
+    <select id="productQna" resultType="com.naturalskin.dto.QnaDto"> 
+		SELECT * FROM qna_board WHERE product_id = #{param1}
+	</select>	
+	
+    
+</mapper>

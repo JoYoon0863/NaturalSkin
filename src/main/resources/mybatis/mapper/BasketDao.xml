@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IBasketDao"> 
+
+	<insert id="add">
+	  <selectKey keyProperty="basket_id" resultType="int" order="BEFORE">
+	        select basket_seq.nextval FROM DUAL
+	  </selectKey>
+      INSERT INTO basket(basket_id, member_id, product_id, basket_amount)
+      VALUES (#{basket_id}, #{param1}, #{param2}, #{param3})
+   </insert>
+   
+   <select id="list" resultType="com.naturalskin.dto.BasketDto">
+     SELECT * FROM basket a, product b WHERE a.member_id = #{param1} AND a.product_id = b.product_id ORDER BY a.basket_id ASC
+   </select>
+   
+   <delete id="selectDelete">
+		DELETE FROM basket WHERE basket_id = #{param1}
+	</delete>
+	
+	<delete id="allDelete">
+		DELETE FROM basket WHERE member_id = #{param1}
+	</delete>
+	
+	<update id="update">
+		UPDATE basket SET basket_amount = #{param2} WHERE basket_id = #{param1}
+	</update>
+	
+	<select id="count" resultType="int">
+		SELECT COUNT(*) FROM basket WHERE member_id = #{param1}
+	</select>
+    
+</mapper>

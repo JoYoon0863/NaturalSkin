@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.INoticeBoardDao"> 
+
+	<select id="noticeBoard_list" resultType="com.naturalskin.dto.NoticeBoardDto"> 
+		SELECT * FROM notice_board ORDER BY notice_board_id DESC
+	</select>
+	
+	<select id="SearchID" resultType="com.naturalskin.dto.NoticeBoardDto"> 
+		SELECT * FROM notice_board WHERE member_id LIKE '%' || #{param1} || '%' ORDER BY notice_board_id DESC 
+	</select>
+	
+	<select id="SearchName" resultType="com.naturalskin.dto.NoticeBoardDto"> 
+		SELECT * FROM notice_board WHERE notice_board_title LIKE '%' || #{param1} || '%' ORDER BY notice_board_id DESC 
+	</select>
+	
+	<insert id="noticeBoardWrite">
+		<selectKey keyProperty="notice_board_id" resultType="int" order="BEFORE">
+			select notice_board_seq.nextval FROM DUAL
+		</selectKey>
+		INSERT INTO notice_board( notice_board_id, member_id, notice_board_title, notice_board_content, notice_board_date, notice_board_hit )
+						VALUES (#{notice_board_id}, #{param1}, #{param2}, #{param3}, sysdate, default)
+	</insert>
+	
+	<select id="noticeBoardContentView" resultType="com.naturalskin.dto.NoticeBoardDto"> 
+		SELECT * FROM notice_board WHERE notice_board_id = #{param1}
+	</select>
+	
+	<update id="hit">
+		UPDATE notice_board SET notice_board_hit = notice_board_hit + 1 WHERE notice_board_id = #{param1}
+	</update> 
+	
+	<update id="aNoticeViewUpdate">
+		UPDATE notice_board SET notice_board_title = #{param2}, notice_board_content = #{param3} WHERE notice_board_id = #{param1}
+	</update> 
+	
+	<delete id="noticeDelete">
+		DELETE FROM notice_board WHERE notice_board_id = #{param1}
+	</delete>
+	
+	<select id="listPageDao" resultType="com.naturalskin.dto.NoticeBoardDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, notice_board.*
+	        FROM
+	            notice_board
+	        ORDER BY notice_board_id desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+	
+    <select id="pageCount" resultType="int">
+		SELECT COUNT(*) FROM notice_board
+	</select>
+	
+	<select id="SearchTitle" resultType="com.naturalskin.dto.NoticeBoardDto"> 
+		SELECT * FROM notice_board WHERE notice_board_title LIKE '%' || #{param1} || '%' ORDER BY notice_board_id DESC 
+	</select>
+
+</mapper>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IOrderDao"> 
+
+	<select id="order_count" resultType="int">
+			SELECT COUNT(*) FROM member_order WHERE member_order_state = '배송준비중' 
+	</select>
+
+	<select id="orderCancel_count" resultType="int">
+			SELECT COUNT(*) FROM member_order WHERE member_order_state = '주문취소요청' 
+	</select>
+
+	<select id="order_list" resultType="com.naturalskin.dto.OrderDto"> 
+		SELECT * FROM member a JOIN member_order b ON a.member_id = b.member_id ORDER BY b.member_order_id DESC
+	</select>
+	
+	<select id="order_name" resultType="com.naturalskin.dto.MemberDto"> 
+		SELECT * FROM member a JOIN member_order b ON a.member_id = b.member_id ORDER BY b.member_order_id DESC
+	</select>
+	
+	<select id="SearchID" resultType="com.naturalskin.dto.OrderDto"> 
+		SELECT * FROM member_order WHERE member_id LIKE '%' || #{param1} || '%' ORDER BY member_order_id DESC 
+	</select>
+	
+	<select id="SearchName" resultType="com.naturalskin.dto.OrderDto"> 
+		<!-- SELECT * FROM member_order WHERE member_name LIKE '%' || #{param1} || '%' ORDER BY member_order_id DESC  -->
+		SELECT * FROM member a JOIN member_order b ON a.member_id = b.member_id WHERE a.member_name LIKE '%' || #{param1} || '%'  ORDER BY b.member_id DESC
+	</select>
+	
+	<select id="SearchOrderNum" resultType="com.naturalskin.dto.OrderDto"> 
+		SELECT * FROM member_order WHERE member_order_id LIKE '%' || #{param1} || '%' ORDER BY member_order_id DESC 
+	</select>
+	
+	<select id="orderView" resultType="com.naturalskin.dto.OrderDto"> 
+		SELECT * FROM member_order WHERE member_order_id = #{param1}
+	</select>	
+	
+	<update id="aOrderViewUpdate">
+		UPDATE member_order SET member_order_receive_name = #{param2}, member_order_receive_address = #{param3}, member_order_receive_phone= #{param4},
+		member_order_state= #{param5} WHERE member_order_id = #{param1}
+	</update> 
+	   
+	<delete id="orderDelete">
+		DELETE FROM member_order WHERE member_order_id = #{param1}
+	</delete>   
+	
+	<select id="listPageDao" resultType="com.naturalskin.dto.OrderDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, member_order.*
+	        FROM
+	            member_order
+	        ORDER BY member_order_id desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+    
+    <select id="pageCount" resultType="int">
+		SELECT COUNT(*) FROM member_order
+	</select>
+	
+	<select id="newOrder" resultType="com.naturalskin.dto.OrderDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, member_order.*
+	        FROM
+	            member_order
+	        WHERE
+	        	member_order_state = '배송준비중'
+	        ORDER BY 
+	        	member_order_id desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+    
+    <select id="orderCancel" resultType="com.naturalskin.dto.OrderDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, member_order.*
+	        FROM
+	            member_order
+	        WHERE
+	        	member_order_state = '주문취소요청'
+	        ORDER BY 
+	        	member_order_id desc
+	    )
+		WHERE
+    		RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+    
+    <select id="myOrder" resultType="com.naturalskin.dto.OrderDto"> 
+		SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, member_order.*
+	        FROM
+	            member_order
+	        WHERE
+	        	member_id = #{param3}
+	        ORDER BY 
+	        	member_order_date desc
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+	</select>
+    
+    <insert id="order">
+	  <selectKey keyProperty="member_order_id" resultType="int" order="BEFORE">
+	        select member_order_seq.nextval FROM DUAL
+	  </selectKey>
+      INSERT INTO member_order(member_order_id, member_id, member_order_state, member_order_date, member_order_price, 
+      							member_order_payment_method, member_order_receive_address, member_order_receive_name, 
+      							member_order_receive_phone ) 
+	  VALUES (#{member_order_id}, #{param1}, '배송준비중', sysdate, #{param2}, #{param3}, #{param4}, #{param5}, #{param6})
+   </insert>
+   
+   <select id="myOrderCheck" resultType="int"> 
+		SELECT max(member_order_id) KEEP(DENSE_RANK FIRST ORDER BY member_order_id DESC) FROM member_order WHERE member_id = #{param1}
+	</select>	
+	
+	<select id="myPageOrder" resultType="com.naturalskin.dto.OrderDto"> 
+		SELECT * FROM member_order WHERE member_order_id = #{param1}
+	</select>	
+	
+	<update id="update">
+		UPDATE member_order SET member_order_receive_name = #{param2}, member_order_receive_address = #{param3}, member_order_receive_phone= #{param4}
+		WHERE member_order_id = #{param1}
+	</update> 
+	
+	<update id="cancle">
+		UPDATE member_order SET member_order_state= '주문취소요청' WHERE member_order_id = #{param1}
+	</update> 
+	
+</mapper>

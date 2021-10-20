@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.naturalskin.dao.IProductDao"> 
+
+	<select id="product_list" resultType="com.naturalskin.dto.ProductDto">
+		SELECT * FROM product ORDER BY product_id DESC
+	</select>
+	
+	<select id="productContentView" resultType="com.naturalskin.dto.ProductDto"> 
+		SELECT * FROM product WHERE product_id = #{param1}
+	</select>
+	
+	<update id="productContentAction">
+		UPDATE product SET product_name = #{param2}, product_price = #{param3}, product_main_img_path = #{param4},
+		 		product_content_img_path = #{param5}, product_stock = #{param6}, product_category = #{param7}, 
+		 		product_content = #{param8} 
+		WHERE product_id = #{param1}
+	</update> 
+	
+	<insert id="productWA">
+		<selectKey keyProperty="product_id" resultType="int" order="BEFORE">
+			select product_seq.nextval FROM DUAL
+		</selectKey>
+			INSERT INTO product( product_id, product_category, product_name, product_stock, product_price, product_main_img_path, 
+									product_content_img_path, product_content, product_date )
+			VALUES (#{product_id}, #{param1}, #{param2}, #{param3}, #{param4}, #{param5}, #{param6}, #{param7}, sysdate)
+	</insert>
+	
+	<delete id="delete">
+		DELETE product WHERE product_id = #{param1}
+	</delete>
+	
+	<select id="product_count" resultType="int">
+		SELECT COUNT(*) FROM product
+	</select>
+	
+	<select id="pageCount" resultType="int">
+		SELECT COUNT(*) FROM product
+	</select>
+	
+	<select id="listPageDao" resultType="com.naturalskin.dto.ProductDto">
+	   	SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, product.*
+	        FROM
+	            product
+	        ORDER BY 
+	        	product_id DESC
+	    )
+		WHERE
+    	RNUM BETWEEN #{param1} AND #{param2}
+    </select>
+	
+	<select id="SearchName" resultType="com.naturalskin.dto.ProductDto"> 
+		SELECT *
+		FROM
+	    (
+	        SELECT 
+	            ROWNUM AS RNUM, product.*
+	        FROM
+	            product
+            WHERE
+            	product_name LIKE '%' || #{param1} || '%'
+	        ORDER BY 
+	        	product_id DESC
+	    )
+		WHERE
+	    	RNUM BETWEEN #{param2} AND #{param3}
+	</select>
+	
+	<select id="searchCount" resultType="int">
+		SELECT COUNT(*) FROM product WHERE product_name LIKE '%' || #{param1} || '%'
+	</select>
+	
+	<select id="myPageOrder" resultType="com.naturalskin.dto.ProductDto"> 
+		SELECT * FROM member_order a, order_detail b, product c WHERE a.member_order_id = #{param1} AND b.member_order_id = #{param1} AND b.product_id = c.product_id
+	</select>	
+	
+	<select id="myPageOrderList" resultType="com.naturalskin.dto.ProductDto"> 
+		SELECT * FROM order_detail b, product c WHERE  b.member_id = #{param1} AND b.product_id = c.product_id
+	</select>	
+	
+	<select id="basketList" resultType="com.naturalskin.dto.ProductDto"> 
+		SELECT * FROM basket a, product b WHERE a.member_id = #{param1} AND a.product_id = b.product_id ORDER BY a.basket_id ASC
+	</select>	
+	
+	<select id="reviewV" resultType="com.naturalskin.dto.ProductDto"> 
+		SELECT * FROM review_board a, product b WHERE review_board_id = #{param1} AND a.product_id = #{param2} AND b.product_id = #{param2}
+	</select>	
+	
+	
+	
+</mapper>
