@@ -761,7 +761,7 @@ public class MemberController {
 			out.println("<script language='javascript'>");
 			out.println("alert('주문취소요청이 완료되었습니다.')");
 			out.println("window.close()");
-			out.println("opener.window.close()");
+			out.println("opener.window.location.reload()");
 			out.println("opener.opener.window.location.reload()");
 			out.println("</script>");
 
@@ -831,7 +831,7 @@ public class MemberController {
 		
 		int result = basketService.update(bid, amount);
 		System.out.println("결과 : " + result);
-		if(result >= 1) { //아이디 중복됨
+		if(result >= 1) {
 	 		return("1");
 	 	} else {
 	 		return("0");

@@ -7,7 +7,7 @@
 <mapper namespace="com.naturalskin.dao.IProductDao"> 
 
 	<select id="product_list" resultType="com.naturalskin.dto.ProductDto">
-		SELECT * FROM product ORDER BY product_id DESC
+		SELECT * FROM product WHERE product_id > 0 ORDER BY product_id DESC
 	</select>
 	
 	<select id="productContentView" resultType="com.naturalskin.dto.ProductDto"> 
@@ -35,7 +35,7 @@
 	</delete>
 	
 	<select id="product_count" resultType="int">
-		SELECT COUNT(*) FROM product
+		SELECT COUNT(*) FROM product WHERE product_id > 0
 	</select>
 	
 	<select id="pageCount" resultType="int">
@@ -50,6 +50,8 @@
 	            ROWNUM AS RNUM, product.*
 	        FROM
 	            product
+	        WHERE
+	        	product_id > 0    
 	        ORDER BY 
 	        	product_id DESC
 	    )

@@ -22,8 +22,8 @@
 <link rel="stylesheet" href="css/member/qna/qnaMain.css">
 <script type="text/javascript"></script>
 <script>
+var id = '<%=(String)session.getAttribute("member_id")%>';
     function login_check(){ 
-         var id = '<%=(String)session.getAttribute("member_id")%>';
 
           if(id=="null"){ 
              alert("로그인 후 이용가능합니다.", "error"); 
@@ -48,11 +48,11 @@
 		<th>작성일</th>
 	</tr>
 	<c:forEach var="dto" items="${qna_list }" varStatus="status">
-		<c:if test="${dto.member_id != 'admin' }">
-			<tr onclick="location.href='qnaV1?qna_board_id=${dto.qna_board_id }'">
+	    <c:if test="${dto.member_id != 'admin' }">
+			<tr onclick="check(${dto.qna_board_id},${dto.qna_board_lock},'${dto.member_id}');">
 	    </c:if>
 	    <c:if test="${dto.member_id eq 'admin' }">
-			<tr onclick="location.href='qnaV2?qna_board_id=${dto.qna_board_id }'">
+			<tr onclick="check2(${dto.qna_board_id},${dto.qna_board_lock},'${dto.member_id}');">
 	    </c:if>
 
 		<td>${dto.qna_board_id }</td>
@@ -102,6 +102,49 @@
 	</nav>
 	<br><br><br>
 	<c:import url="../../footer.jsp"/>
-	<script></script>
+	<script>
+	function check(boardId,boardLock,memberId){
+		if(boardLock == 1){
+			if('${member_id}' == ''){
+				return alert('접근권한이 없습니다');
+			}
+			if(id == 'admin'){
+				window.location.href='qnaV1?qna_board_id='+boardId;
+			}else{
+				if(id == memberId){
+					window.location.href='qnaV1?qna_board_id='+boardId;
+				}else{
+						return alert('접근권한이 없습니다');
+				}
+			}
+				
+		}else{
+			window.location.href='qnaV1?qna_board_id='+boardId;
+		}
+	}
+	
+	function check2(boardId,boardLock,memberId){
+		if(boardLock == 1){
+			if('${member_id}' == ''){
+				return alert('접근권한이 없습니다');
+			}
+			if(id == 'admin'){
+				window.location.href='qnaV2?qna_board_id='+boardId;
+			}else{
+				if(id == memberId){
+					window.location.href='qnaV2?qna_board_id='+boardId;
+				}else{
+					if(id == memberId){
+						window.location.href='qnaV1?qna_board_id='+boardId;
+					}else{
+							return alert('접근권한이 없습니다');
+					}
+				}
+			}
+		}else{
+			window.location.href='qnaV2?qna_board_id='+boardId;
+		}
+	}
+	</script>
 </body>
 </html>
